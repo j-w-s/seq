@@ -1,0 +1,6 @@
+return {
+  _all = {
+    lua = "luajit",
+    lpath = "./src/?.lua;./?.lua;./spec/support/?.lua",
+  },
+}
