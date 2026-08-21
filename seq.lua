@@ -2,6 +2,11 @@
 LuaJIT-optimized, lazy sequence combinator library.
 ]]
 
-local core = require("src/core")
+require("sources")
+require("terminal")
+require("combinators")
+require("combinators_pairs")
+
+local core = require("core")
 
 return core.Seq
