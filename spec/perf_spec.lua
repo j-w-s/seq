@@ -16,7 +16,7 @@ local function assert_allocation_free(label, build_fn)
 
   collectgarbage("collect")
   collectgarbage("stop")
-  
+
   local kb0 = collectgarbage("count")
 
   local seq = build_fn()

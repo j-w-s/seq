@@ -1,7 +1,6 @@
 # Seq
 
-LuaJIT-optimized, lazy sequence combinator library.
-Built on Lua's `gen/param/state` iterator triplet.
+LuaJIT-optimized, lazy sequence combinator library built on Lua's `gen/param/state` iterator triplet.
 
 ```lua
 local Seq = require("seq")
@@ -12,8 +11,6 @@ local result = Seq.from({1,2,3,4,5})
     :collect()
 -- {6, 8}
 ```
-
-## Design
 
 ## Design
 
@@ -70,3 +67,13 @@ Every sequence is a `gen/param/state` triplet: `state', value = gen(param, state
 | `seq:find(pred)` | Return the first element for which `pred(v)` is true, or `nil` if none match |
 | `seq:any(pred)` | True if `pred(v)` holds for at least one element |
 | `seq:all(pred)` | True if `pred(v)` holds for every element or the sequence is empty |
+
+## Notes
+
+- `take`, `drop`, `chain`, `chain2`, and their `_while` variants use a mutable upvalue internally (a counter/flag), which makes the resulting `Seq` single-use, same as Lua's own `ipairs`/`pairs` triplets. Don't iterate the same returned `Seq` twice.
+- `enumerate()` and `zip(other)` are the only single-value combinators that yield three values (`state, a, b`) instead of the library-wide two-value `state, value` contract; `from_pairs` and its family yield `(k, v)` where `k` doubles as state. Every other combinator and every terminal op destructures exactly two return values from `prev_gen`, so chaining anything after `enumerate`/`zip` (another combinator, `:each()`, `:collect()`) silently drops one of the two yielded values with no error, and `:collect2()`/`:collect_pairs()` are not interchangeable (each assumes one specific arity; using the wrong one on a given sequence also fails silently rather than erroring). Use `enumerate()`/`zip()` as the last stage of a pipeline, and either call `:collect2()` or drive the triplet directly:
+  ```lua
+  for _, a, b in seq.gen, seq.param, seq.state do ... end
+  ```
+- `flat_map`'s `fn` runs once per outer element, inside the hot loop. If `fn` builds a fresh Lua closure on every call, that inner sequence runs correctly but permanently interpreted (LuaJIT 2.1 can't trace closure allocation). Prefer an inner `fn` that returns a closure-free source (`Seq.from`/`Seq.from_pairs`).
+- `collect()`/`collect2()`/`collect_pairs()` do not support `nil` elements; use a sentinel value if you need to represent "no value."

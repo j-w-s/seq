@@ -1,8 +1,6 @@
 local D = require("datagen")
 local Seq = require("seq")
 
--- this family's gen yields (k, v); drive the raw triplet where a test
--- needs both, since :each(fn) only forwards a single value.
 local function drive(seq, fn)
   for k, v in seq.gen, seq.param, seq.state do fn(k, v) end
 end
@@ -82,8 +80,6 @@ end)
 
 describe("scan2", function()
   it("running fold keeps key, threads accumulator as value", function()
-    -- iteration order over a hash part isn't guaranteed, so check the
-    -- final accumulator's value rather than asserting exact sequence.
     local t = { a = 1, b = 2, c = 3 }
     local last_acc = nil
     drive(Seq.from_pairs(t):scan2(function(acc, k, v) return acc + v end, 0), function(k, v)
@@ -130,9 +126,6 @@ describe("chain2", function()
   end)
 
   it("overlapping keys across sides both survive as separate pairs", function()
-    -- from_pairs's contract is (k, v) with k possibly repeated across
-    -- the two source tables -- chain2 doesn't dedupe, it just
-    -- concatenates the two iteration streams.
     local n = Seq.from_pairs({ dup = 1 }):chain2(Seq.from_pairs({ dup = 2 })):values():length()
     assert.equal(2, n)
   end)

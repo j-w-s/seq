@@ -309,7 +309,7 @@ end)
 
 --[[
 fn(v) must return a Seq or plain array table. Avoid functions that build
-a fresh closure per call. FNEW NYI in LuaJIT
+a fresh closure per call. FNEW NYI in LuaJIT.
 ]]
 function Seq:flat_map(fn)
   if type(fn) ~= "function" then error("flat_map: fn must be a function", 2) end

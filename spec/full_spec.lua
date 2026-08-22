@@ -11,7 +11,7 @@ describe("performance", function()
     collectgarbage("collect")
     collectgarbage("collect")
     collectgarbage("stop")
-    
+
     local t0 = os.clock()
     local seq_result = Seq.from(t)
       :map(function(x) return x * 2 end)
