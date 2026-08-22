@@ -40,7 +40,7 @@ Every sequence is a `gen/param/state` triplet: `state', value = gen(param, state
 | `seq:scan(fn, init)` | Running fold (`init` required), yielding intermediate accumulators |
 | `seq:chain(other)` | Yield every element of `self`, then every element of `other` (single-use) |
 | `seq:enumerate()` | Yields `(index, value)` pairs, index starting at 1 |
-| `seq:zip(other)` | Yields `(a, b)` pairs, stopping when either side ends |
+| `seq:zip(other)` | Yields `(a, b)` pairs, stopping when either side ends (single-use) |
 | `seq:flat_map(fn)` | `fn(v)` returns a `Seq` or plain array table; each inner sequence is fully drained before advancing |
 
 ### Key/Value Combinators
@@ -70,7 +70,7 @@ Every sequence is a `gen/param/state` triplet: `state', value = gen(param, state
 
 ## Notes
 
-- `take`, `drop`, `chain`, `chain2`, and their `_while` variants use a mutable upvalue internally (a counter/flag), which makes the resulting `Seq` single-use, same as Lua's own `ipairs`/`pairs` triplets. Don't iterate the same returned `Seq` twice.
+- `take`, `drop`, `chain`, `chain2`, `zip`, and `take_while`/`drop_while` use a mutable upvalue internally (a counter/flag/cursor), which makes the resulting `Seq` single-use, same as Lua's own `ipairs`/`pairs` triplets. Don't iterate the same returned `Seq` twice.
 - `enumerate()` and `zip(other)` are the only single-value combinators that yield three values (`state, a, b`) instead of the library-wide two-value `state, value` contract; `from_pairs` and its family yield `(k, v)` where `k` doubles as state. Every other combinator and every terminal op destructures exactly two return values from `prev_gen`, so chaining anything after `enumerate`/`zip` (another combinator, `:each()`, `:collect()`) silently drops one of the two yielded values with no error, and `:collect2()`/`:collect_pairs()` are not interchangeable (each assumes one specific arity; using the wrong one on a given sequence also fails silently rather than erroring). Use `enumerate()`/`zip()` as the last stage of a pipeline, and either call `:collect2()` or drive the triplet directly:
   ```lua
   for _, a, b in seq.gen, seq.param, seq.state do ... end
