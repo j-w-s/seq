@@ -57,4 +57,12 @@ LuaJIT 2.1, not reference/PUC-Rio Lua.
 ```sh
 luajit -e 'local Seq = require("seq"); print(Seq.from({1,2,3}):map(function(x) return x*2 end):collect()[2])'
 # should print: 4
+
+luajit -e 'local Seq = require("seq"); local result = Seq.from({1,2,3,4,5})
+    :map(function(x) return x * 2 end)
+    :filter(function(x) return x > 4 end)
+    :take(2)
+    :collect()
+print(table.concat(result, ", "))'
+# should print: 6, 8
 ```
