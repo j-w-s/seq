@@ -2,8 +2,8 @@
 Pooling moves the gen closure one level deeper, into
 a Lua source string built by string.format and load() at
 pool-construction time. check_upvalue.lua checks the outer
-method never reassigns prev_gen/prev_param/fn before make_gen(); 
-this checks the inner generated constructor has the same property 
+method never reassigns prev_gen/prev_param/fn before make_gen();
+this checks the inner generated constructor has the same property
 for the nested gen closure that captures them as upvalues.
 ]]
 
