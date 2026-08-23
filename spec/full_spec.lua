@@ -201,11 +201,11 @@ describe("end-to-end pipelines", function()
     end
 
     local collected = pipeline():collect()
-    local counted    = pipeline():length()
-    local reduced    = pipeline():reduce(function(acc, v) acc[#acc + 1] = v; return acc end, {})
-    local all_mod7   = pipeline():all(function(x) return x % 7 == 0 end)
+    local counted = pipeline():length()
+    local reduced = pipeline():reduce(function(acc, v) acc[#acc + 1] = v; return acc end, {})
+    local all_mod7 = pipeline():all(function(x) return x % 7 == 0 end)
     local any_gt9990 = pipeline():any(function(x) return x > 9990 end)
-    local found      = pipeline():find(function(x) return x == 70 end)
+    local found = pipeline():find(function(x) return x == 70 end)
 
     assert.equal(counted, #collected)
     assert.same(reduced, collected)
