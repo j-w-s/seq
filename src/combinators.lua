@@ -64,10 +64,10 @@ local TAKE_POOL = protopool.new_pool(POOL_SIZE, function(i)
       local remaining = n
       local function take_gen_%d(param, state)
         if remaining <= 0 then return nil end
-        local new_state, v = prev_gen(param, state)
+        local new_state, va, vb = prev_gen(param, state)
         if new_state == nil then return nil end
         remaining = remaining - 1
-        return new_state, v
+        return new_state, va, vb
       end
       return take_gen_%d
     end
@@ -199,8 +199,8 @@ local CHAIN_POOL = protopool.new_pool(POOL_SIZE, function(i)
       local on_first = true
       local function chain_gen_%d(param, state)
         if on_first then
-          local new_a, v = gen_a(param_a, state)
-          if new_a ~= nil then return new_a, v end
+          local new_a, va, vb = gen_a(param_a, state)
+          if new_a ~= nil then return new_a, va, vb end
           on_first = false
           return chain_gen_%d(param, state_b0)
         end
@@ -293,7 +293,7 @@ local FLAT_MAP_POOL = protopool.new_pool(POOL_SIZE, function(i)
           local new_inner_state, v = inner_gen(inner_param, inner_state)
           if new_inner_state ~= nil then
             inner_state = new_inner_state
-            return state, v
+            return new_inner_state, v
           end
         end
         local new_outer, ov = prev_gen(param, outer_state)
